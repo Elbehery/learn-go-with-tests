@@ -205,7 +205,7 @@ When you run the tests they should now pass. Normally as part of the TDD cycle w
 At this point, if you are using source control \(which you should!\) I would
 `commit` the code as it is. We have working software backed by a test.
 
-I _wouldn't_ push to master though, because I plan to refactor next. It is nice
+I _wouldn't_ push to main though, because I plan to refactor next. It is nice
 to commit at this point in case you somehow get into a mess with refactoring - you can always go back to the working version.
 
 There's not a lot to refactor here, but we can introduce another language feature, _constants_.
@@ -409,20 +409,20 @@ The tests should now pass.
 Now it is time to _refactor_. You should see some problems in the code, "magic" strings, some of which are repeated. Try and refactor it yourself, with every change make sure you re-run the tests to make sure your refactoring isn't breaking anything.
 
 ```go
-    const spanish = "Spanish"
-    const englishHelloPrefix = "Hello, "
-    const spanishHelloPrefix = "Hola, "
+	const spanish = "Spanish"
+	const englishHelloPrefix = "Hello, "
+	const spanishHelloPrefix = "Hola, "
 
-func Hello(name string, language string) string {
-	if name == "" {
-		name = "World"
-	}
+	func Hello(name string, language string) string {
+		if name == "" {
+			name = "World"
+		}
 
-	if language == spanish {
-		return spanishHelloPrefix + name
+		if language == spanish {
+			return spanishHelloPrefix + name
+		}
+		return englishHelloPrefix + name
 	}
-	return englishHelloPrefix + name
-}
 ```
 
 ### French
@@ -462,9 +462,9 @@ func Hello(name string, language string) string {
 	prefix := englishHelloPrefix
 
 	switch language {
-	case "french":
+	case "French":
 		prefix = frenchHelloPrefix
-	case "spanish":
+	case "Spanish":
 		prefix = spanishHelloPrefix
 	}
 
@@ -483,10 +483,10 @@ You could argue that maybe our function is getting a little big. The simplest re
 const (
 	french  = "French"
 	spanish = "Spanish"
-    
-    englishHelloPrefix = "Hello, "
-    spanishHelloPrefix = "Hola, "
-    frenchHelloPrefix = "Bonjour, "
+
+	englishHelloPrefix = "Hello, "
+	spanishHelloPrefix = "Hola, "
+	frenchHelloPrefix  = "Bonjour, "
 )
 
 func Hello(name string, language string) string {

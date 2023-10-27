@@ -411,7 +411,7 @@ panic: reflect: call of reflect.Value.NumField on ptr Value [recovered]
 func walk(x interface{}, fn func(input string)) {
 	val := reflect.ValueOf(x)
 
-	if val.Kind() == reflect.Ptr {
+	if val.Kind() == reflect.Pointer {
 		val = val.Elem()
 	}
 
@@ -453,7 +453,7 @@ func walk(x interface{}, fn func(input string)) {
 func getValue(x interface{}) reflect.Value {
 	val := reflect.ValueOf(x)
 
-	if val.Kind() == reflect.Ptr {
+	if val.Kind() == reflect.Pointer {
 		val = val.Elem()
 	}
 
@@ -744,7 +744,7 @@ To fix this, we'll need to move our assertion with the maps to a new test where 
 ```go
 t.Run("with maps", func(t *testing.T) {
 	aMap := map[string]string{
-		"Cow": "Moo",
+		"Cow":   "Moo",
 		"Sheep": "Baa",
 	}
 
@@ -770,7 +770,7 @@ func assertContains(t testing.TB, haystack []string, needle string) {
 		}
 	}
 	if !contains {
-		t.Errorf("expected %+v to contain %q but it didn't", haystack, needle)
+		t.Errorf("expected %v to contain %q but it didn't", haystack, needle)
 	}
 }
 ```
