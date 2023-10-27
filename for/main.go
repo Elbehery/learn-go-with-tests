@@ -2,11 +2,10 @@ package main
 
 import "fmt"
 
-func Repeat(ch string) string {
-	const repeat = 5
+func Repeat(ch string, n int) string {
 	var res string
 	i := 0
-	for i < repeat {
+	for i < n {
 		res += ch
 		i++
 	}
