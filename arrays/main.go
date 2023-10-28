@@ -19,6 +19,10 @@ func SumAll(slices ...[]int) []int {
 func SumAllTails(slices ...[]int) []int {
 	var res []int
 	for _, s := range slices {
+		if len(s) == 0 {
+			res = append(res, 0)
+			continue
+		}
 		tail := s[1:]
 		res = append(res, Sum(tail))
 	}
