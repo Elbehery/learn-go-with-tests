@@ -20,9 +20,7 @@ func TestSumAll(t *testing.T) {
 	act := SumAll([]int{1, 2}, []int{0, 9})
 	exp := []int{3, 9}
 
-	if !reflect.DeepEqual(act, exp) {
-		t.Errorf("expected %v, but got %v instead", exp, act)
-	}
+	assertFunc(t, act, exp)
 }
 
 func TestSumAllTails(t *testing.T) {
@@ -47,9 +45,14 @@ func TestSumAllTails(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			act := SumAllTails(tc.input...)
-			if !reflect.DeepEqual(act, tc.exp) {
-				t.Errorf("expected %v, but got %v instead", tc.exp, act)
-			}
+			assertFunc(t, act, tc.exp)
 		})
+	}
+}
+
+func assertFunc(t testing.TB, act, exp []int) {
+	t.Helper()
+	if !reflect.DeepEqual(act, exp) {
+		t.Errorf("expected %v, but got %v instead", exp, act)
 	}
 }
