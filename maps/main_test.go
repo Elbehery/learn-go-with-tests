@@ -107,6 +107,34 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
+func TestDelete(t *testing.T) {
+	testCases := []struct {
+		name   string
+		key    string
+		exp    string
+		expErr error
+	}{
+		{
+			name:   "key exist",
+			key:    "test",
+			expErr: nil,
+		},
+		{
+			name:   "key not exist",
+			key:    "unknown",
+			expErr: ErrKeyNotFound,
+		},
+	}
+
+	d.Add("test", "this is an updated test")
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := d.Delete(tc.key)
+			assertError(t, err, tc.expErr)
+		})
+	}
+}
+
 func assertStrings(t testing.TB, got, exp string) {
 	t.Helper()
 

@@ -39,3 +39,12 @@ func (d Dictionary) Update(key, value string) error {
 	d[key] = value
 	return nil
 }
+
+func (d Dictionary) Delete(key string) error {
+	_, ok := d[key]
+	if !ok {
+		return ErrKeyNotFound
+	}
+	delete(d, key)
+	return nil
+}
