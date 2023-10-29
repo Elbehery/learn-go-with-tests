@@ -75,6 +75,38 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestUpdate(t *testing.T) {
+	testCases := []struct {
+		name   string
+		key    string
+		exp    string
+		expErr error
+	}{
+		{
+			name:   "key exist",
+			key:    "test",
+			exp:    "this is an updated test",
+			expErr: nil,
+		},
+		{
+			name:   "key not exist",
+			key:    "unknown",
+			exp:    "",
+			expErr: ErrUpdateKeyNotFound,
+		},
+	}
+
+	d.Add("key exist", "this is just a test")
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := d.Update(tc.key, tc.exp)
+			assertError(t, err, tc.expErr)
+			act, err := d.Search(tc.key)
+			assertStrings(t, act, tc.exp)
+		})
+	}
+}
+
 func assertStrings(t testing.TB, got, exp string) {
 	t.Helper()
 
