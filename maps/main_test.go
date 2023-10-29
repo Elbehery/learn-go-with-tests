@@ -1,8 +1,18 @@
 package maps
 
 import (
+	"os"
 	"testing"
 )
+
+var d Dictionary
+
+func TestMain(m *testing.M) {
+	d = Dictionary{}
+	code := m.Run()
+	d = nil
+	os.Exit(code)
+}
 
 func TestSearch(t *testing.T) {
 	testCases := []struct {
@@ -24,11 +34,35 @@ func TestSearch(t *testing.T) {
 			expErr: ErrKeyNotFound,
 		},
 	}
+	d["test"] = "this is just a test"
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			act, err := d.Search(tc.key)
+			assertError(t, err, tc.expErr)
+			assertStrings(t, act, tc.exp)
+		})
+	}
+}
 
-	d := Dictionary{"test": "this is just a test"}
+func TestAdd(t *testing.T) {
+	testCases := []struct {
+		name   string
+		key    string
+		exp    string
+		expErr error
+	}{
+		{
+			name:   "key exist",
+			key:    "test",
+			exp:    "this is just a test",
+			expErr: nil,
+		},
+	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			d.Add(tc.key, tc.exp)
+
 			act, err := d.Search(tc.key)
 			assertError(t, err, tc.expErr)
 			assertStrings(t, act, tc.exp)
