@@ -52,19 +52,24 @@ func TestAdd(t *testing.T) {
 		expErr error
 	}{
 		{
-			name:   "key exist",
-			key:    "test",
+			name:   "new key",
+			key:    "newTest",
 			exp:    "this is just a test",
 			expErr: nil,
+		},
+		{
+			name:   "existing key",
+			key:    "test",
+			exp:    "this is just a test",
+			expErr: ErrKeyAlreadyExist,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			d.Add(tc.key, tc.exp)
-
-			act, err := d.Search(tc.key)
+			err := d.Add(tc.key, tc.exp)
 			assertError(t, err, tc.expErr)
+			act, err := d.Search(tc.key)
 			assertStrings(t, act, tc.exp)
 		})
 	}
