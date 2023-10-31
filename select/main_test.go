@@ -8,14 +8,11 @@ import (
 )
 
 func TestRace(t *testing.T) {
-	slowSrvr := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		time.Sleep(20 * time.Millisecond)
-		writer.WriteHeader(http.StatusOK)
-	}))
+	slowSrvr := makeDelayedServer(20 * time.Millisecond)
+	fastSrvr := makeDelayedServer(0 * time.Millisecond)
 
-	fastSrvr := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(http.StatusOK)
-	}))
+	defer slowSrvr.Close()
+	defer fastSrvr.Close()
 
 	slowUrl := slowSrvr.URL
 	fastUrl := fastSrvr.URL
@@ -24,6 +21,7 @@ func TestRace(t *testing.T) {
 	act := Racer(slowUrl, fastUrl)
 
 	assertStrings(t, exp, act)
+
 }
 
 func assertStrings(t testing.TB, exp, got string) {
@@ -32,4 +30,11 @@ func assertStrings(t testing.TB, exp, got string) {
 	if exp != got {
 		t.Fatalf("expected %v, but got %v instead", exp, got)
 	}
+}
+
+func makeDelayedServer(d time.Duration) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		time.Sleep(d)
+		writer.WriteHeader(http.StatusOK)
+	}))
 }
