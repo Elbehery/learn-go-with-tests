@@ -7,28 +7,38 @@ import (
 	"time"
 )
 
-func TestRace(t *testing.T) {
-	slowSrvr := makeDelayedServer(20 * time.Millisecond)
-	fastSrvr := makeDelayedServer(0 * time.Millisecond)
+func TestRacer(t *testing.T) {
+	t.Run("compares speeds of servers, returning the url of the fastest one", func(t *testing.T) {
+		slowServer := makeDelayedServer(20 * time.Millisecond)
+		fastServer := makeDelayedServer(0 * time.Millisecond)
 
-	defer slowSrvr.Close()
-	defer fastSrvr.Close()
+		defer slowServer.Close()
+		defer fastServer.Close()
 
-	slowUrl := slowSrvr.URL
-	fastUrl := fastSrvr.URL
+		slowUrl := slowServer.URL
+		fastUrl := fastServer.URL
 
-	exp := fastUrl
-	act := Racer(slowUrl, fastUrl)
+		act, _ := Racer(slowUrl, fastUrl)
+		exp := fastUrl
 
-	assertStrings(t, exp, act)
+		assertStrings(t, act, exp)
+	})
 
+	t.Run("returns an error if a server doesn't respond within 10s", func(t *testing.T) {
+		srvr := makeDelayedServer(25 * time.Millisecond)
+		url := srvr.URL
+
+		_, err := ConfigurableRacer(url, url, 20*time.Millisecond)
+		if err == nil {
+			t.Error("expected an error but didn't get one")
+		}
+	})
 }
 
-func assertStrings(t testing.TB, exp, got string) {
+func assertStrings(t testing.TB, got, want string) {
 	t.Helper()
-
-	if exp != got {
-		t.Fatalf("expected %v, but got %v instead", exp, got)
+	if got != want {
+		t.Errorf("expected %v but got %v instead", want, got)
 	}
 }
 
