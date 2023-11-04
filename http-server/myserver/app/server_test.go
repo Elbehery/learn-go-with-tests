@@ -21,7 +21,7 @@ func TestGetPlayers(t *testing.T) {
 		"Floyd":  10,
 	}}
 
-	svr := &PlayerServer{store: store}
+	svr := &PlayerServer{Store: store}
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		req := newGetScoreRequest("Pepper")
