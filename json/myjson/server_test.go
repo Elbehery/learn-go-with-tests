@@ -48,6 +48,7 @@ func TestLeague(t *testing.T) {
 		}
 
 		assertStatus(t, resp.Code, http.StatusOK)
+		assertContentType(t, resp, "application/json")
 	})
 }
 
@@ -59,5 +60,12 @@ func assertStatus(t testing.TB, act, exp int) {
 	t.Helper()
 	if act != exp {
 		t.Errorf("expected %v, but got %v instead", exp, act)
+	}
+}
+
+func assertContentType(t testing.TB, resp *httptest.ResponseRecorder, exp string) {
+	t.Helper()
+	if resp.Result().Header.Get("content-type") != exp {
+		t.Errorf("response did not have content-type of application/json, got %v", resp.Result().Header)
 	}
 }
