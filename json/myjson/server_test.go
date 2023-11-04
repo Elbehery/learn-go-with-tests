@@ -21,7 +21,7 @@ func (s *StubPlayerStore) RecordWin(player string) {
 func TestLeague(t *testing.T) {
 
 	store := StubPlayerStore{map[string]int{}}
-	srvr := PlayerServer{&store}
+	srvr := NewPlayerServer(&store)
 
 	t.Run("it returns 200 on /league", func(t *testing.T) {
 		req := newLeagueGetRequest()
