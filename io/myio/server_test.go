@@ -43,6 +43,15 @@ func TestGetPlayer(t *testing.T) {
 		assertStatus(t, resp.Code, http.StatusOK)
 		assertString(t, resp.Body.String(), "20")
 	})
+
+	t.Run("returns Floyd's score", func(t *testing.T) {
+		req := newGetScoreRequest("Floyd")
+		resp := httptest.NewRecorder()
+
+		srvr.ServeHTTP(resp, req)
+		assertStatus(t, resp.Code, http.StatusOK)
+		assertString(t, resp.Body.String(), "10")
+	})
 }
 
 func newGetScoreRequest(player string) *http.Request {
