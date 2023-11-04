@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -8,7 +9,7 @@ import (
 
 func TestGetPlayers(t *testing.T) {
 	t.Run("returns Pepper's score", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/players/Pepper", nil)
+		req := newGetScoreRequest("Pepper")
 		resp := httptest.NewRecorder()
 
 		PlayerServer(resp, req)
@@ -17,9 +18,25 @@ func TestGetPlayers(t *testing.T) {
 
 		assertStrings(t, exp, act)
 	})
+
+	t.Run("returns Floyd's score", func(t *testing.T) {
+		req := newGetScoreRequest("Floyd")
+		resp := httptest.NewRecorder()
+
+		PlayerServer(resp, req)
+		act := resp.Body.String()
+		exp := "10"
+
+		assertStrings(t, exp, act)
+	})
 }
 
-func assertStrings(t testing.TB, act, exp string) {
+func newGetScoreRequest(name string) *http.Request {
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/player/%s", name), nil)
+	return req
+}
+
+func assertStrings(t testing.TB, exp, act string) {
 	t.Helper()
 
 	if act != exp {

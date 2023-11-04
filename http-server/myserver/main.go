@@ -8,5 +8,5 @@ import (
 
 func main() {
 	handler := http.HandlerFunc(app.PlayerServer)
-	log.Fatal(http.ListenAndServe(":5000", handler))
+	log.Fatal(http.ListenAndServe(":5001", handler))
 }
