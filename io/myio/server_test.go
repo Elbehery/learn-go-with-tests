@@ -52,6 +52,14 @@ func TestGetPlayer(t *testing.T) {
 		assertStatus(t, resp.Code, http.StatusOK)
 		assertString(t, resp.Body.String(), "10")
 	})
+
+	t.Run("returns 404 on missing players", func(t *testing.T) {
+		req := newGetScoreRequest("mustii")
+		resp := httptest.NewRecorder()
+
+		srvr.ServeHTTP(resp, req)
+		assertStatus(t, resp.Code, http.StatusNotFound)
+	})
 }
 
 func newGetScoreRequest(player string) *http.Request {
