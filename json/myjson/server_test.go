@@ -1,6 +1,7 @@
 package myjson
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,6 +19,17 @@ func (s *StubPlayerStore) RecordWin(player string) {
 	s.store[player]++
 }
 
+func (s *StubPlayerStore) GetLeague() []Player {
+	var players []Player
+	for k, v := range s.store {
+		players = append(players, Player{
+			Name: k,
+			Wins: v,
+		})
+	}
+	return players
+}
+
 func TestLeague(t *testing.T) {
 
 	store := StubPlayerStore{map[string]int{}}
@@ -28,6 +40,13 @@ func TestLeague(t *testing.T) {
 		resp := httptest.NewRecorder()
 
 		srvr.ServeHTTP(resp, req)
+		var players []Player
+		err := json.NewDecoder(resp.Body).Decode(&players)
+
+		if err != nil {
+			t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", resp.Body, err)
+		}
+
 		assertStatus(t, resp.Code, http.StatusOK)
 	})
 }
