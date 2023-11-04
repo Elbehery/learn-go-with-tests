@@ -44,6 +44,17 @@ func TestGetPlayers(t *testing.T) {
 
 		assertStrings(t, exp, act)
 	})
+
+	t.Run("returns 404 on missing players", func(t *testing.T) {
+		req := newGetScoreRequest("Apollo")
+		resp := httptest.NewRecorder()
+
+		svr.ServerHttp(resp, req)
+		act := resp.Code
+		exp := http.StatusNotFound
+
+		assertStatusCode(t, exp, act)
+	})
 }
 
 func newGetScoreRequest(name string) *http.Request {
@@ -52,6 +63,14 @@ func newGetScoreRequest(name string) *http.Request {
 }
 
 func assertStrings(t testing.TB, exp, act string) {
+	t.Helper()
+
+	if act != exp {
+		t.Errorf("expected %v, but got %v instead", exp, act)
+	}
+}
+
+func assertStatusCode(t testing.TB, exp, act int) {
 	t.Helper()
 
 	if act != exp {
