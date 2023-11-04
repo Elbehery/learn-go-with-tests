@@ -62,8 +62,33 @@ func TestGetPlayer(t *testing.T) {
 	})
 }
 
+func TestStoreWins(t *testing.T) {
+	store := &StubPlayerStore{scores: map[string]int{}}
+	srvr := NewPlayerServer(store)
+
+	t.Run("it records wins on POST", func(t *testing.T) {
+		req := newPostWinRequest("Mustafa")
+		resp := httptest.NewRecorder()
+
+		srvr.ServeHTTP(resp, req)
+		assertStatus(t, resp.Code, http.StatusAccepted)
+
+		if len(store.winCall) != 1 {
+			t.Fatal()
+		}
+
+		if store.winCall[0] != "Mustafa" {
+			t.Fatal()
+		}
+	})
+}
+
 func newGetScoreRequest(player string) *http.Request {
 	return httptest.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", player), nil)
+}
+
+func newPostWinRequest(player string) *http.Request {
+	return httptest.NewRequest(http.MethodPost, fmt.Sprintf("/players/%s", player), nil)
 }
 
 func assertStatus(t testing.TB, act, exp int) {
