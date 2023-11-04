@@ -28,7 +28,7 @@ type PlayerServer struct {
 func NewPlayerServer(store PlayerStore) *PlayerServer {
 	srvr := &PlayerServer{store, http.NewServeMux()}
 	srvr.router.Handle("/league", http.HandlerFunc(srvr.leagueHandler))
-	srvr.router.Handle("/player", http.HandlerFunc(srvr.playerHandler))
+	srvr.router.Handle("/players", http.HandlerFunc(srvr.playerHandler))
 	return srvr
 }
 
