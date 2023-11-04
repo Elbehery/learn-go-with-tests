@@ -1,9 +1,12 @@
 package myio
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -83,12 +86,50 @@ func TestStoreWins(t *testing.T) {
 	})
 }
 
+func TestLeague(t *testing.T) {
+	store := &StubPlayerStore{league: []Player{
+		{"Cleo", 32},
+		{"Chris", 20},
+		{"Tiest", 14}}}
+
+	srvr := NewPlayerServer(store)
+
+	t.Run("it returns the league table as JSON", func(t *testing.T) {
+		req := newLeagueRequest()
+		resp := httptest.NewRecorder()
+
+		srvr.ServeHTTP(resp, req)
+		players := getLeagueFromResponse(t, resp.Body)
+		assertStatus(t, resp.Code, http.StatusOK)
+		if !reflect.DeepEqual(players, store.league) {
+			t.Errorf("expected %v, but got %v instead", store.league, players)
+		}
+		if resp.Header().Get("content-type") != jsonContentType {
+			t.Fatal()
+		}
+	})
+}
+
 func newGetScoreRequest(player string) *http.Request {
 	return httptest.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", player), nil)
 }
 
 func newPostWinRequest(player string) *http.Request {
 	return httptest.NewRequest(http.MethodPost, fmt.Sprintf("/players/%s", player), nil)
+}
+
+func newLeagueRequest() *http.Request {
+	return httptest.NewRequest(http.MethodGet, "/league", nil)
+}
+
+func getLeagueFromResponse(t testing.TB, data io.Reader) []Player {
+	t.Helper()
+	var players []Player
+	err := json.NewDecoder(data).Decode(&players)
+	if err != nil {
+		t.Fatalf("can not decode json data")
+	}
+	return players
 }
 
 func assertStatus(t testing.TB, act, exp int) {
