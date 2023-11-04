@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"github.com/quii/learn-go-with-tests/http-server/myserver/app"
+	"log"
+	"net/http"
+)
 
 func main() {
-	fmt.Println("welcome Back mustafa")
+	handler := http.HandlerFunc(app.PlayerServer)
+	log.Fatal(http.ListenAndServe(":5000", handler))
 }
