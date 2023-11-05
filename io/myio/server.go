@@ -19,7 +19,7 @@ type Player struct {
 type PlayerStore interface {
 	GetPlayerWins(string) int
 	RecordWins(string)
-	GetLeague() []Player
+	GetLeague() League
 }
 
 // PlayerServer is an HTTP interface for player information

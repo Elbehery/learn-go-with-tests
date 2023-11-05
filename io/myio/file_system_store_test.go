@@ -8,13 +8,13 @@ import (
 )
 
 func TestFileSystemStore(t *testing.T) {
-	database := `[
+	Database := `[
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`
 
-	db, removeFunc := createTempFile(t, database)
+	db, removeFunc := createTempFile(t, Database)
 	defer removeFunc()
-	store := FileSystemPlayerStore{database: db}
+	store := FileSystemPlayerStore{Database: db}
 
 	t.Run("league from a reader", func(t *testing.T) {
 
@@ -34,7 +34,7 @@ func TestFileSystemStore(t *testing.T) {
 	t.Run("get player score", func(t *testing.T) {
 		exp := 33
 		player := "Chris"
-		act := store.GetPlayerScore(player)
+		act := store.GetPlayerWins(player)
 		if act != exp {
 			t.Errorf("expected %v, but got %v instead", exp, act)
 		}
@@ -43,18 +43,18 @@ func TestFileSystemStore(t *testing.T) {
 	t.Run("store wins for existing players", func(t *testing.T) {
 		exp := 34
 		player := "Chris"
-		store.RecordWin(player)
-		act := store.GetPlayerScore(player)
+		store.RecordWins(player)
+		act := store.GetPlayerWins(player)
 
 		assertScoreEquals(t, act, exp)
 	})
 
 	t.Run("store wins for new players", func(t *testing.T) {
 		newPlayer := "Mustafa"
-		store.RecordWin(newPlayer)
+		store.RecordWins(newPlayer)
 
 		exp := 1
-		act := store.GetPlayerScore(newPlayer)
+		act := store.GetPlayerWins(newPlayer)
 
 		assertScoreEquals(t, act, exp)
 	})
@@ -73,7 +73,7 @@ func createTempFile(t testing.TB, data string) (io.ReadWriteSeeker, func()) {
 
 	f, err := os.CreateTemp("", "db")
 	if err != nil {
-		t.Fatalf("could not create database temp file, %v", err)
+		t.Fatalf("could not create Database temp file, %v", err)
 	}
 
 	f.Write([]byte(data))
