@@ -7,16 +7,24 @@ import (
 
 type FileSystemPlayerStore struct {
 	Database io.ReadWriteSeeker
+	league   League
+}
+
+func NewFileSystemPlayerStore(db io.ReadWriteSeeker) *FileSystemPlayerStore {
+	db.Seek(0, 0)
+	league, _ := NewLeague(db)
+	return &FileSystemPlayerStore{
+		Database: db,
+		league:   league,
+	}
 }
 
 func (f *FileSystemPlayerStore) GetLeague() League {
-	f.Database.Seek(0, 0)
-	league, _ := NewLeague(f.Database)
-	return league
+	return f.league
 }
 
 func (f *FileSystemPlayerStore) GetPlayerWins(name string) int {
-	player := f.GetLeague().Find(name)
+	player := f.league.Find(name)
 	if player == nil {
 		return -1
 	}
@@ -24,7 +32,7 @@ func (f *FileSystemPlayerStore) GetPlayerWins(name string) int {
 }
 
 func (f *FileSystemPlayerStore) RecordWins(name string) {
-	league := f.GetLeague()
+	league := f.league
 	player := league.Find(name)
 	if player != nil {
 		player.Wins++
