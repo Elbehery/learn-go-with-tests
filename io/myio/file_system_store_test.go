@@ -1,7 +1,6 @@
 package myio
 
 import (
-	"io"
 	"os"
 	"reflect"
 	"testing"
@@ -68,7 +67,7 @@ func assertLeague(t testing.TB, act, exp []Player) {
 	}
 }
 
-func createTempFile(t testing.TB, data string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t testing.TB, data string) (*os.File, func()) {
 	t.Helper()
 
 	f, err := os.CreateTemp("", "db")
