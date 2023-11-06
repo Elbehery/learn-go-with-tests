@@ -2,12 +2,11 @@ package myio
 
 import (
 	"encoding/json"
-	"io"
 	"os"
 )
 
 type FileSystemPlayerStore struct {
-	Database io.Writer
+	Database *json.Encoder
 	league   League
 }
 
@@ -15,7 +14,7 @@ func NewFileSystemPlayerStore(db *os.File) *FileSystemPlayerStore {
 	db.Seek(0, 0)
 	league, _ := NewLeague(db)
 	return &FileSystemPlayerStore{
-		Database: &tape{db},
+		Database: json.NewEncoder(&tape{db}),
 		league:   league,
 	}
 }
@@ -33,16 +32,15 @@ func (f *FileSystemPlayerStore) GetPlayerWins(name string) int {
 }
 
 func (f *FileSystemPlayerStore) RecordWins(name string) {
-	league := f.league
-	player := league.Find(name)
+	player := f.league.Find(name)
 	if player != nil {
 		player.Wins++
 	} else {
-		league = append(league, Player{
+		f.league = append(f.league, Player{
 			Name: name,
 			Wins: 1,
 		})
 	}
 
-	json.NewEncoder(f.Database).Encode(league)
+	f.Database.Encode(f.league)
 }
