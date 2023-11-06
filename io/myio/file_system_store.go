@@ -13,6 +13,17 @@ type FileSystemPlayerStore struct {
 
 func NewFileSystemPlayerStore(db *os.File) (*FileSystemPlayerStore, error) {
 	db.Seek(0, 0)
+
+	info, err := db.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("problem getting info for file %s: '%v'", db.Name(), err)
+	}
+
+	if info.Size() == 0 {
+		db.Write([]byte(`[]`))
+		db.Seek(0, 0)
+	}
+
 	league, err := NewLeague(db)
 	if err != nil {
 		return nil, fmt.Errorf("problem loading player store from file %s, '%v'", db.Name(), err)
