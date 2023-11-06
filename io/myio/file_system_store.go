@@ -11,19 +11,26 @@ type FileSystemPlayerStore struct {
 	league   League
 }
 
-func NewFileSystemPlayerStore(db *os.File) (*FileSystemPlayerStore, error) {
-	db.Seek(0, 0)
+func initialisePlayerDBFile(file *os.File) error {
+	file.Seek(0, 0)
 
-	info, err := db.Stat()
+	info, err := file.Stat()
 	if err != nil {
-		return nil, fmt.Errorf("problem getting info for file %s: '%v'", db.Name(), err)
+		return fmt.Errorf("problem getting info for file %s: '%v'", file.Name(), err)
 	}
 
 	if info.Size() == 0 {
-		db.Write([]byte(`[]`))
-		db.Seek(0, 0)
+		file.Write([]byte(`[]`))
+		file.Seek(0, 0)
 	}
 
+	return nil
+}
+func NewFileSystemPlayerStore(db *os.File) (*FileSystemPlayerStore, error) {
+	err := initialisePlayerDBFile(db)
+	if err != nil {
+		return nil, fmt.Errorf("problem initialising player db file, %v", err)
+	}
 	league, err := NewLeague(db)
 	if err != nil {
 		return nil, fmt.Errorf("problem loading player store from file %s, '%v'", db.Name(), err)
