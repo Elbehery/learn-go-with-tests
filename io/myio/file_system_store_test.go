@@ -13,7 +13,8 @@ func TestFileSystemStore(t *testing.T) {
 
 	db, removeFunc := createTempFile(t, Database)
 	defer removeFunc()
-	store := FileSystemPlayerStore{Database: db}
+	store, err := NewFileSystemPlayerStore(db)
+	assertNoError(t, err)
 
 	t.Run("league from a reader", func(t *testing.T) {
 
@@ -89,5 +90,12 @@ func assertScoreEquals(t testing.TB, act, exp int) {
 	t.Helper()
 	if act != exp {
 		t.Errorf("got %d want %d", act, exp)
+	}
+}
+
+func assertNoError(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Errorf("expected no error, but got '%v' instead", err)
 	}
 }

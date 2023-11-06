@@ -2,6 +2,7 @@ package myio
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -10,13 +11,16 @@ type FileSystemPlayerStore struct {
 	league   League
 }
 
-func NewFileSystemPlayerStore(db *os.File) *FileSystemPlayerStore {
+func NewFileSystemPlayerStore(db *os.File) (*FileSystemPlayerStore, error) {
 	db.Seek(0, 0)
-	league, _ := NewLeague(db)
+	league, err := NewLeague(db)
+	if err != nil {
+		return nil, fmt.Errorf("problem loading player store from file %s, '%v'", db.Name(), err)
+	}
 	return &FileSystemPlayerStore{
 		Database: json.NewEncoder(&tape{db}),
 		league:   league,
-	}
+	}, nil
 }
 
 func (f *FileSystemPlayerStore) GetLeague() League {
