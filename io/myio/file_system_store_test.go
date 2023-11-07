@@ -19,8 +19,8 @@ func TestFileSystemStore(t *testing.T) {
 	t.Run("league from a reader", func(t *testing.T) {
 
 		exp := []Player{
-			{"Cleo", 10},
 			{"Chris", 33},
+			{"Cleo", 10},
 		}
 
 		// read first time
@@ -65,6 +65,33 @@ func TestFileSystemStore(t *testing.T) {
 		_, err := NewFileSystemPlayerStore(emptyFile)
 		assertNoError(t, err)
 	})
+
+	t.Run("league sorted", func(t *testing.T) {
+		db, cleanFn := createTempFile(t, `[
+			{"Name": "Cleo", "Wins": 10},
+			{"Name": "Chris", "Wins": 33}]`)
+
+		defer cleanFn()
+
+		store, err := NewFileSystemPlayerStore(db)
+		assertNoError(t, err)
+
+		act := store.GetLeague()
+		exp := League{
+			Player{
+				Name: "Chris",
+				Wins: 33,
+			},
+			Player{
+				Name: "Cleo",
+				Wins: 10,
+			},
+		}
+
+		assertLeague(t, act, exp)
+		//act = store.GetLeague()
+		//assertLeague(t, act, exp)
+	})
 }
 
 func assertLeague(t testing.TB, act, exp []Player) {
@@ -80,17 +107,16 @@ func createTempFile(t testing.TB, data string) (*os.File, func()) {
 
 	f, err := os.CreateTemp("", "db")
 	if err != nil {
-		t.Fatalf("could not create Database temp file, %v", err)
+		t.Fatalf("error creating temp file: '%v'", err)
 	}
 
 	f.Write([]byte(data))
-
-	removeFunc := func() {
+	cleanFn := func() {
 		f.Close()
 		os.Remove(f.Name())
 	}
 
-	return f, removeFunc
+	return f, cleanFn
 }
 
 func assertScoreEquals(t testing.TB, act, exp int) {
